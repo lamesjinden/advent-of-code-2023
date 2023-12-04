@@ -120,10 +120,10 @@
           (rf result input))))))
   ([pred coll]
    (lazy-seq
-     (when-let [s (seq coll)]
-       (if (pred (first s))
-         (cons (first s) nil)
-         (cons (first s) (take-until pred (rest s))))))))
+    (when-let [s (seq coll)]
+      (if (pred (first s))
+        (cons (first s) nil)
+        (cons (first s) (take-until pred (rest s))))))))
 
 (defn drop-nil
   "returns a lazy seq containing the non-nil elements of coll"
@@ -167,12 +167,26 @@
       nil)))
 
 (defn ->grid
+  "creates a 2D grid (vector of vector) from the input string. 
+   `project` is invoked for each character of the input and the resulting
+   value will occupy the associated cell in the grid.
+   
+   `project` must be a function of arity 2:
+     the first arg is the input character value,
+     the second arg is a vector of length 2 representing the row index and column index.
+   "
   ([ss project]
    (->> ss
         (str/split-lines)
-        (mapv (fn [row] (mapv project row)))))
+        (map-indexed (fn [row-index row]
+                       (->> row
+                            (map-indexed (fn [col-index value]
+                                           (project value [row-index col-index])))
+                            (into []))))
+        (into [])))
   ([ss]
-   (->grid ss identity)))
+   (->grid ss (fn [x [_row-index _col-index]]
+                x))))
 
 (defn find-in-grid
   "
@@ -202,12 +216,12 @@
   [coords & {:keys [include-diagonal]
              :or   {include-diagonal false}}]
   (as-> [:up :right :down :left] $
-        (if include-diagonal (concat $ [:up-right :down-right :down-left :up-left]) $)
-        (map #(% grid-neighbor-transforms) $)
-        (map #(m/add coords %) $)))
+    (if include-diagonal (concat $ [:up-right :down-right :down-left :up-left]) $)
+    (map #(% grid-neighbor-transforms) $)
+    (map #(m/add coords %) $)))
 
 (defn neighbors [grid coords & {:keys [include-diagonal]
                                 :or   {include-diagonal false}}]
   (->> (neighbor-coords coords include-diagonal)
        (map (fn [[row col]] (get-in grid [row col])))
-       (filter some?)))
+       (filter some?)))"
