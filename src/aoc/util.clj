@@ -224,4 +224,4 @@
                                 :or   {include-diagonal false}}]
   (->> (neighbor-coords coords include-diagonal)
        (map (fn [[row col]] (get-in grid [row col])))
-       (filter some?)))"
+       (filter some?)))
