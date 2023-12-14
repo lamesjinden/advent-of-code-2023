@@ -74,19 +74,7 @@ QQQJA 483")
        (apply +)))
 
 
-(def card-and-joker->strength {\2 2
-                               \3 3
-                               \4 4
-                               \5 5
-                               \6 6
-                               \7 7
-                               \8 8
-                               \9 9
-                               \T 10
-                               \J 1
-                               \Q 12
-                               \K 13
-                               \A 14})
+(def card-and-joker->strength (assoc card->strength \J 1))
 
 (defn hand-and-joker->type [hand]
   (let [joker-grouping (group-by #(= % \J) hand)
